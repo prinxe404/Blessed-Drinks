@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: var(--font-headline), 'Playfair Display', Georgia, serif;
+  --font-body: var(--font-body), 'Plus Jakarta Sans', sans-serif;
+}
+
+:root {
+  --primary: #003422;
+  --primary-container: #174c36;
+  --on-primary: #ffffff;
+  --on-primary-container: #86bc9f;
+  --secondary: #7c5800;
+  --secondary-container: #ffcd70;
+  --on-secondary-container: #785500;
+  --surface: #fcf9f0;
+  --surface-bright: #fcf9f0;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f6f3ea;
+  --surface-container: #f1eee5;
+  --surface-container-high: #ebe8df;
+  --surface-container-highest: #e5e2da;
+  --surface-dim: #dddad1;
+  --on-surface: #1c1c17;
+  --on-surface-variant: #404943;
+  --tertiary: #2d2d2d;
+  --tertiary-container: #434343;
+  --on-tertiary: #ffffff;
+  --outline: #717973;
+  --outline-variant: #c0c9c1;
+  --error: #ba1a1a;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-body), 'Plus Jakarta Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, .font-serif, .font-headline {
+  font-family: var(--font-headline), 'Playfair Display', Georgia, serif;
+}
+
+.font-body {
+  font-family: var(--font-body), 'Plus Jakarta Sans', sans-serif;
+}
