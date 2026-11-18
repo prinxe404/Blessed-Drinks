@@ -16,8 +16,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function AdminOverviewPage() {
-  const orders = await fetchOrders()
-  const products = await fetchProducts()
+  const [orders, products] = await Promise.all([fetchOrders(), fetchProducts()])
 
   // Live Summary Stats from real database records
   const totalOrders = orders.length
