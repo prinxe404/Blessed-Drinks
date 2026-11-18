@@ -303,9 +303,6 @@ export default async function AdminOverviewPage() {
           <span>
             Showing {recentOrders.length} of {totalOrders} recorded orders.
           </span>
-          <span className="uppercase tracking-widest text-[10px]">
-            Live Neon Database Ledger
-          </span>
         </div>
       </div>
     </div>

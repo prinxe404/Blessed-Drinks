@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageCircle, Check, MapPin, Phone, User, Clock, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MessageCircle, Check, MapPin, Phone, User, Clock, CheckCircle2, PackageOpen, RotateCw } from 'lucide-react'
 import { OrderRecord } from '@/types'
 
 interface OrdersManagerProps {
@@ -10,11 +10,42 @@ interface OrdersManagerProps {
 
 export function OrdersManager({ initialOrders }: OrdersManagerProps) {
   const [orders, setOrders] = useState<OrderRecord[]>(initialOrders)
-  const [selectedOrder, setSelectedOrder] = useState<OrderRecord>(initialOrders[0] || null)
+  const [selectedOrder, setSelectedOrder] = useState<OrderRecord | null>(initialOrders[0] || null)
   const [activeTab, setActiveTab] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const [statusFeedback, setStatusFeedback] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Keep orders up to date with initialOrders or live refetches
+  useEffect(() => {
+    setOrders(initialOrders)
+    if (initialOrders.length > 0 && !selectedOrder) {
+      setSelectedOrder(initialOrders[0])
+    }
+  }, [initialOrders])
+
+  const refreshOrders = async () => {
+    setIsRefreshing(true)
+    try {
+      const res = await fetch('/api/admin?type=orders')
+      const data = await res.json()
+      if (data.success && Array.isArray(data.data)) {
+        setOrders(data.data)
+        if (data.data.length > 0) {
+          // If previously selected order is in new data, keep it updated, else pick first
+          const current = data.data.find((o: OrderRecord) => o.orderId === selectedOrder?.orderId)
+          setSelectedOrder(current || data.data[0])
+        } else {
+          setSelectedOrder(null)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to refresh orders', e)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   const filteredOrders = orders.filter((ord) => {
     const matchesSearch =
@@ -32,33 +63,36 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
     return true
   })
 
-  const handleStatusChange = async (newStatus: OrderRecord['status']) => {
-    if (!selectedOrder) return
-
+  const handleStatusChange = async (targetOrderId: string, newStatus: OrderRecord['status']) => {
     setIsUpdatingStatus(true)
+    setStatusFeedback(null)
+
     try {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'update_order_status',
-          orderId: selectedOrder.orderId,
+          orderId: targetOrderId,
           status: newStatus,
         }),
       })
 
       const data = await res.json()
       if (data.success) {
-        const updated = { ...selectedOrder, status: newStatus }
-        setSelectedOrder(updated)
-        setOrders((prev) => prev.map((o) => (o.orderId === updated.orderId ? updated : o)))
-        setStatusFeedback(`Status successfully updated to ${newStatus.toUpperCase()}`)
-        setTimeout(() => setStatusFeedback(null), 3000)
+        setOrders((prev) =>
+          prev.map((o) => (o.orderId === targetOrderId ? { ...o, status: newStatus } : o))
+        )
+        if (selectedOrder && selectedOrder.orderId === targetOrderId) {
+          setSelectedOrder((prev) => (prev ? { ...prev, status: newStatus } : null))
+        }
+        setStatusFeedback(`Order ${targetOrderId} updated to ${newStatus.toUpperCase()}`)
+        setTimeout(() => setStatusFeedback(null), 3500)
       } else {
-        alert('Could not update status')
+        alert(data.message || 'Could not update status')
       }
     } catch (e) {
-      alert('Network error')
+      alert('Network error while updating status')
     } finally {
       setIsUpdatingStatus(false)
     }
@@ -77,19 +111,36 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
             <span className="text-xs uppercase tracking-widest text-[#404943]">Accra Metro Depot</span>
           </div>
           <h1 className="font-headline text-3xl sm:text-4xl text-[#1c1c17] font-semibold">
-            Order Management & Fulfillment
+            WhatsApp Orders & Fulfillment
           </h1>
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={refreshOrders}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#003422]/20 text-xs font-semibold uppercase tracking-wider text-[#003422] hover:bg-[#fcf9f0] transition-colors disabled:opacity-50"
+            title="Refresh order list"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Refreshing...' : 'Refresh Orders'}</span>
+          </button>
+
           <div className="flex items-center gap-2 bg-[#f1eee5] px-4 py-2 border border-[#003422]/10 text-xs text-[#1c1c17]">
             <span className="w-2 h-2 rounded-full bg-[#7c5800] animate-pulse"></span>
             <span className="uppercase tracking-wider font-semibold">
-              WhatsApp Dispatch Gateway Active
+              Live Gateway Active
             </span>
           </div>
         </div>
       </div>
+
+      {statusFeedback && (
+        <div className="p-3 bg-green-50 border border-green-300 text-green-800 text-xs font-semibold flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-green-700" />
+          <span>{statusFeedback}</span>
+        </div>
+      )}
 
       {/* Grid: 7 Columns List, 5 Columns Dossier */}
       <div className="grid grid-cols-12 gap-6 items-start">
@@ -129,89 +180,107 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
             />
           </div>
 
-          {/* Table */}
-          <div className="bg-white border border-[#003422]/10 shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#ebe8df] text-[#404943] text-xs uppercase tracking-wider border-b border-[#003422]/10">
-                  <th className="py-3 px-4 font-semibold">Reference</th>
-                  <th className="py-3 px-4 font-semibold">Customer</th>
-                  <th className="py-3 px-4 font-semibold">Total</th>
-                  <th className="py-3 px-4 font-semibold">Timestamp</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 text-right font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#003422]/5 text-xs text-[#1c1c17]">
-                {filteredOrders.map((ord) => {
-                  const isSelected = selectedOrder?.orderId === ord.orderId
-
-                  let statusBadge = (
-                    <span className="inline-block bg-[#ffcd70] text-[#785500] uppercase tracking-widest px-2 py-0.5 font-bold">
-                      Pending
-                    </span>
-                  )
-
-                  if (ord.status === 'confirmed') {
-                    statusBadge = (
-                      <span className="inline-block bg-[#174c36] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
-                        Confirmed
-                      </span>
-                    )
-                  } else if (ord.status === 'completed') {
-                    statusBadge = (
-                      <span className="inline-block bg-[#003422] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
-                        Completed
-                      </span>
-                    )
-                  } else if (ord.status === 'processing') {
-                    statusBadge = (
-                      <span className="inline-block bg-[#434343] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
-                        Processing
-                      </span>
-                    )
-                  } else if (ord.status === 'cancelled') {
-                    statusBadge = (
-                      <span className="inline-block bg-red-100 text-red-800 uppercase tracking-widest px-2 py-0.5 font-bold">
-                        Cancelled
-                      </span>
-                    )
-                  }
-
-                  return (
-                    <tr
-                      key={ord.orderId}
-                      onClick={() => setSelectedOrder(ord)}
-                      className={`cursor-pointer transition-colors ${
-                        isSelected ? 'bg-[#f1eee5]' : 'hover:bg-[#fcf9f0]'
-                      }`}
-                    >
-                      <td className="py-3 px-4 font-bold text-[#003422]">{ord.orderId}</td>
-                      <td className="py-3 px-4">
-                        <p className="font-semibold">{ord.customerName}</p>
-                        <p className="text-[10px] text-[#404943]">{ord.phoneNumber}</p>
-                      </td>
-                      <td className="py-3 px-4 font-bold text-[#003422]">
-                        GH₵ {ord.totalAmount.toFixed(2)}
-                      </td>
-                      <td className="py-3 px-4 text-[#404943]">{ord.createdAt}</td>
-                      <td className="py-3 px-4">{statusBadge}</td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          type="button"
-                          className={`uppercase tracking-wider font-semibold ${
-                            isSelected ? 'text-[#7c5800] font-bold' : 'text-[#404943]'
-                          }`}
-                        >
-                          {isSelected ? 'Viewing' : 'Select'}
-                        </button>
+          {/* Table or Empty State */}
+          {orders.length === 0 ? (
+            <div className="bg-white border border-[#003422]/10 p-12 text-center flex flex-col items-center justify-center">
+              <PackageOpen className="w-12 h-12 text-[#404943]/40 mb-3" />
+              <h3 className="font-headline text-lg text-[#003422] font-semibold">No Orders in Database</h3>
+              <p className="text-xs text-[#404943] max-w-sm mt-1">
+                When customers place an order through WhatsApp checkout, it will instantly appear in this table.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white border border-[#003422]/10 shadow-sm overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-[#ebe8df] text-[#404943] text-xs uppercase tracking-wider border-b border-[#003422]/10">
+                    <th className="py-3 px-4 font-semibold">Reference</th>
+                    <th className="py-3 px-4 font-semibold">Customer</th>
+                    <th className="py-3 px-4 font-semibold">Total</th>
+                    <th className="py-3 px-4 font-semibold">Timestamp</th>
+                    <th className="py-3 px-4 font-semibold">Status</th>
+                    <th className="py-3 px-4 text-right font-semibold">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#003422]/5 text-xs text-[#1c1c17]">
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-xs text-[#404943]">
+                        No orders match the current filter.
                       </td>
                     </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    filteredOrders.map((ord) => {
+                      const isSelected = selectedOrder?.orderId === ord.orderId
+
+                      let statusBadge = (
+                        <span className="inline-block bg-[#ffcd70] text-[#785500] uppercase tracking-widest px-2 py-0.5 font-bold">
+                          Pending
+                        </span>
+                      )
+
+                      if (ord.status === 'confirmed') {
+                        statusBadge = (
+                          <span className="inline-block bg-[#174c36] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
+                            Confirmed
+                          </span>
+                        )
+                      } else if (ord.status === 'completed') {
+                        statusBadge = (
+                          <span className="inline-block bg-[#003422] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
+                            Completed
+                          </span>
+                        )
+                      } else if (ord.status === 'processing') {
+                        statusBadge = (
+                          <span className="inline-block bg-[#434343] text-white uppercase tracking-widest px-2 py-0.5 font-bold">
+                            Processing
+                          </span>
+                        )
+                      } else if (ord.status === 'cancelled') {
+                        statusBadge = (
+                          <span className="inline-block bg-[#ba1a1a]/15 text-[#ba1a1a] uppercase tracking-widest px-2 py-0.5 font-bold">
+                            Cancelled
+                          </span>
+                        )
+                      }
+
+                      return (
+                        <tr
+                          key={ord.orderId}
+                          onClick={() => setSelectedOrder(ord)}
+                          className={`cursor-pointer transition-colors ${
+                            isSelected ? 'bg-[#f1eee5]' : 'hover:bg-[#fcf9f0]'
+                          }`}
+                        >
+                          <td className="py-3 px-4 font-bold text-[#003422]">{ord.orderId}</td>
+                          <td className="py-3 px-4">
+                            <p className="font-semibold">{ord.customerName}</p>
+                            <p className="text-[10px] text-[#404943]">{ord.phoneNumber}</p>
+                          </td>
+                          <td className="py-3 px-4 font-bold text-[#003422]">
+                            GH₵ {ord.totalAmount.toFixed(2)}
+                          </td>
+                          <td className="py-3 px-4 text-[#404943]">{ord.createdAt}</td>
+                          <td className="py-3 px-4">{statusBadge}</td>
+                          <td className="py-3 px-4 text-right">
+                            <button
+                              type="button"
+                              className={`uppercase tracking-wider font-semibold ${
+                                isSelected ? 'text-[#7c5800] font-bold' : 'text-[#404943]'
+                              }`}
+                            >
+                              {isSelected ? 'Viewing' : 'Select'}
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Live Order Dossier (5 Cols) */}
@@ -232,12 +301,14 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
                 </h2>
               </div>
 
-              {/* Status Selector */}
+              {/* Status Selector Dropdown */}
               <div className="flex items-center gap-2">
+                <label className="text-[10px] uppercase font-bold text-[#404943]">Status:</label>
                 <select
                   value={selectedOrder.status}
-                  onChange={(e) => handleStatusChange(e.target.value as any)}
-                  className="bg-white border border-[#003422]/20 px-3 py-2 text-xs uppercase font-semibold text-[#1c1c17] focus:outline-none cursor-pointer"
+                  disabled={isUpdatingStatus}
+                  onChange={(e) => handleStatusChange(selectedOrder.orderId, e.target.value as any)}
+                  className="bg-white border-2 border-[#003422] px-3 py-1.5 text-xs uppercase font-bold text-[#003422] focus:outline-none cursor-pointer disabled:opacity-50"
                 >
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
@@ -248,12 +319,33 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
               </div>
             </div>
 
-            {statusFeedback && (
-              <div className="p-3 bg-green-50 border border-green-300 text-green-800 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-700" />
-                <span>{statusFeedback}</span>
+            {/* Quick Action Toggle Buttons for Admin convenience */}
+            <div className="bg-[#fcf9f0] p-3 border border-[#003422]/15 flex items-center justify-between gap-2">
+              <span className="text-[11px] font-semibold text-[#1c1c17]">Quick Update:</span>
+              <div className="flex items-center gap-2">
+                {selectedOrder.status !== 'completed' && (
+                  <button
+                    type="button"
+                    disabled={isUpdatingStatus}
+                    onClick={() => handleStatusChange(selectedOrder.orderId, 'completed')}
+                    className="px-3 py-1.5 bg-[#003422] text-white hover:bg-[#174c36] text-[11px] uppercase font-bold tracking-wider flex items-center gap-1 transition-colors disabled:opacity-50"
+                  >
+                    <Check className="w-3.5 h-3.5 text-[#ffcd70]" />
+                    <span>Mark as Completed</span>
+                  </button>
+                )}
+                {selectedOrder.status !== 'pending' && (
+                  <button
+                    type="button"
+                    disabled={isUpdatingStatus}
+                    onClick={() => handleStatusChange(selectedOrder.orderId, 'pending')}
+                    className="px-3 py-1.5 bg-[#ffcd70] text-[#785500] hover:bg-[#f6c257] text-[11px] uppercase font-bold tracking-wider transition-colors disabled:opacity-50"
+                  >
+                    <span>Mark as Pending</span>
+                  </button>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Client Dossier */}
             <div className="bg-[#f6f3ea] p-4 flex flex-col gap-3 border border-[#003422]/10">
@@ -314,12 +406,12 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
                   Ordered Drinks Allocation
                 </span>
                 <span className="text-xs uppercase text-[#7c5800] font-bold">
-                  {selectedOrder.items.length} Blends
+                  {selectedOrder.items?.length || 0} Blends
                 </span>
               </div>
 
               <div className="bg-[#f6f3ea] border border-[#003422]/10 divide-y divide-[#003422]/5">
-                {selectedOrder.items.map((item, idx) => (
+                {(selectedOrder.items || []).map((item, idx) => (
                   <div key={idx} className="p-3 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-[#003422] text-white flex items-center justify-center font-bold text-xs shrink-0">
