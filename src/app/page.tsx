@@ -4,6 +4,9 @@ import { Footer } from '@/components/Footer'
 import { Storefront } from '@/components/Storefront'
 import { CartToast } from '@/components/CartToast'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function HomePage() {
   const products = await fetchProducts()
 
