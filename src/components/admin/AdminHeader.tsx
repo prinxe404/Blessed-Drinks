@@ -22,14 +22,23 @@ export function AdminHeader({ title, onMenuClick }: { title?: string; onMenuClic
   }
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-20 bg-[#fcf9f0]/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#003422]/10 z-40 flex items-center justify-between px-8">
+    <header className="fixed top-0 left-0 right-0 h-20 bg-[#fcf9f0]/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#003422]/10 z-40 flex items-center justify-between px-8">
       <div className="flex items-center gap-3">
         <span className="font-headline text-xl text-[#003422] font-semibold">
           {title || 'Blessed Drinks Operations'}
         </span>
       </div>
 
-      <div className="flex items-center gap-6">
+      {/* Hamburger for mobile */}
+      <button
+        className="md:hidden flex items-center text-[#003422]"
+        onClick={onMenuClick}
+        aria-label="Toggle navigation"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
+      <div className="hidden md:flex items-center gap-6">
         <Link
           href="/"
           target="_blank"

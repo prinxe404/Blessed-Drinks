@@ -2,12 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingBag, User } from 'lucide-react'
+import { ShoppingBag, User, Menu, X } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
+import { useState } from 'react'
 
 export function Header() {
   const pathname = usePathname()
   const { itemCount } = useCart()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
   return (
     <header className="fixed top-0 w-full z-50 bg-[#fcf9f0]/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#003422]/10">
@@ -27,7 +31,16 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Navigation */}
+        {/* Hamburger for mobile */}
+        <button
+          className="md:hidden flex items-center text-[#003422]"
+          onClick={toggleMenu}
+          aria-label="Toggle navigation"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+
+        {/* Navigation - hidden on small screens */}
         <nav className="hidden md:flex items-center gap-8">
           <Link
             href="/"
@@ -69,6 +82,35 @@ export function Header() {
           </Link>
         </div>
       </div>
+
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-20 left-0 w-full bg-[#fcf9f0] border-b border-[#003422]/10 shadow-md">
+          <nav className="flex flex-col space-y-4 p-4">
+            <Link
+              href="/"
+              onClick={toggleMenu}
+              className="text-xs uppercase tracking-widest text-[#404943] hover:text-[#003422] transition-colors"
+            >
+              Home
+            </Link>
+            <a
+              href="/#drinks-catalog"
+              onClick={toggleMenu}
+              className="text-xs uppercase tracking-widest text-[#404943] hover:text-[#003422] transition-colors"
+            >
+              Drinks
+            </a>
+            <a
+              href="/#about-section"
+              onClick={toggleMenu}
+              className="text-xs uppercase tracking-widest text-[#404943] hover:text-[#003422] transition-colors"
+            >
+              About
+            </a>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
