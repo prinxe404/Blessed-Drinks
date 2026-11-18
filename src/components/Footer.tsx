@@ -16,7 +16,7 @@ export function Footer() {
               rhythms and ancestral refreshment.
             </p>
             <span className="text-[10px] uppercase tracking-wider text-[#ffcd70] bg-[#003422] px-3 py-1 inline-block font-semibold">
-              Accra & Tema Delivery
+              KNUST Delivery
             </span>
           </div>
 
@@ -27,13 +27,13 @@ export function Footer() {
             </h4>
             <p className="text-xs text-[#404943]">WhatsApp Order Desk:</p>
             <a
-              href="https://wa.me/233240001234"
+              href="https://wa.me/233593457520"
               target="_blank"
               rel="noopener noreferrer"
               className="text-base font-bold text-[#003422] hover:text-[#7c5800] transition-colors flex items-center gap-1.5"
             >
               <MessageCircle className="w-4 h-4 text-[#7c5800]" />
-              +233 24 000 1234
+              +233 59 345 7520
             </a>
             <p className="text-[11px] text-[#404943]">
               Same-day chilled courier dispatched daily.
@@ -60,32 +60,13 @@ export function Footer() {
                 <Share2 className="w-4 h-4" />
                 Social Channels
               </a>
-              <a
-                href="#"
-                className="text-xs text-[#404943] hover:text-[#003422] transition-colors flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                Online Journal
-              </a>
             </div>
-          </div>
-
-          {/* Column 4: Pledge */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-[#1c1c17]">
-              Our Pledge
-            </h4>
-            <p className="text-xs text-[#404943] leading-relaxed">
-              100% natural, unpasteurized cold extracts. Sustainably sourced across Greater Accra,
-              Volta, and Eastern agrarian networks.
-            </p>
-          </div>
+          </div>       
         </div>
 
         <div className="pt-8 border-t border-[#003422]/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-[11px] text-[#404943]">
-            © {new Date().getFullYear()} Blessed Drinks Ghana. Handcrafted in Accra. All rights
-            reserved.
+           &copy; {new Date().getFullYear()} Blessed Drinks Ghana. All rights reserved.
           </span>
           <div className="flex items-center gap-6">
             <span className="text-[11px] text-[#404943]">Artisanal Heritage Beverages</span>

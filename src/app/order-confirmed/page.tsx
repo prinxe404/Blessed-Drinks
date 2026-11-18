@@ -53,7 +53,7 @@ export default async function OrderConfirmedPage({
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://wa.me/233240001234"
+              href="https://wa.me/233593457520"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#003422] hover:bg-[#174c36] text-white px-6 py-3.5 text-xs font-semibold uppercase tracking-wider transition-colors shadow-sm"

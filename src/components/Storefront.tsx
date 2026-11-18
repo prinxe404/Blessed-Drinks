@@ -23,7 +23,7 @@ export function Storefront({ initialProducts }: StorefrontProps) {
   const featuredProduct = initialProducts.find((p) => p.isFeatured) || initialProducts[0]
 
   return (
-    <main className="w-full pt-20 bg-[#fcf9f0] min-h-screen">
+    <main className="w-full pt-5 bg-[#fcf9f0] min-h-screen">
       {/* Hero Section */}
       <section className="w-full px-5 md:px-12 pt-10 pb-16 bg-[#fcf9f0] border-b border-[#003422]/10">
         <div className="max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -32,7 +32,7 @@ export function Storefront({ initialProducts }: StorefrontProps) {
             <div className="flex items-center gap-2 mb-4">
               <span className="w-8 h-[1px] bg-[#7c5800]"></span>
               <span className="text-xs uppercase tracking-[0.2em] text-[#7c5800] font-semibold">
-                Accra Micro-Brewery & Herbarium
+                BLESSED DRINKS
               </span>
             </div>
 
@@ -60,22 +60,6 @@ export function Storefront({ initialProducts }: StorefrontProps) {
                 <span className="text-[11px] uppercase tracking-wider text-[#1c1c17] font-medium">
                   100% Raw Ingredients • Chilled on Delivery
                 </span>
-              </div>
-            </div>
-
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#003422]/10 w-full max-w-lg">
-              <div>
-                <span className="font-headline text-2xl text-[#003422] font-semibold block">04:00</span>
-                <span className="text-[11px] uppercase tracking-wider text-[#404943]">Daily Cold Press</span>
-              </div>
-              <div>
-                <span className="font-headline text-2xl text-[#003422] font-semibold block">Zero</span>
-                <span className="text-[11px] uppercase tracking-wider text-[#404943]">Refined Sugar</span>
-              </div>
-              <div>
-                <span className="font-headline text-2xl text-[#003422] font-semibold block">3°C</span>
-                <span className="text-[11px] uppercase tracking-wider text-[#404943]">Courier Temp</span>
               </div>
             </div>
           </div>
@@ -269,50 +253,6 @@ export function Storefront({ initialProducts }: StorefrontProps) {
                 </div>
               )
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust & Dispatch Details */}
-      <section className="w-full px-5 md:px-12 py-12 bg-[#f1eee5] border-y border-[#003422]/10" id="about-section">
-        <div className="max-w-[1360px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex items-start gap-4">
-            <span className="w-3 h-3 rounded-full bg-[#7c5800] mt-1.5 shrink-0" />
-            <div>
-              <h4 className="font-headline text-base text-[#003422] font-semibold mb-1">
-                Cold-Pressed Extracts
-              </h4>
-              <p className="text-xs text-[#404943] leading-relaxed">
-                Never pasteurized with industrial heat. Natural vitamins and live enzymes preserved
-                entirely intact.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <span className="w-3 h-3 rounded-full bg-[#7c5800] mt-1.5 shrink-0" />
-            <div>
-              <h4 className="font-headline text-base text-[#003422] font-semibold mb-1">
-                Same-Day Chilled Dispatch
-              </h4>
-              <p className="text-xs text-[#404943] leading-relaxed">
-                Direct courier routes across Osu, Airport Residential, Cantonments, East Legon, and
-                Tema.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <span className="w-3 h-3 rounded-full bg-[#7c5800] mt-1.5 shrink-0" />
-            <div>
-              <h4 className="font-headline text-base text-[#003422] font-semibold mb-1">
-                Glass Apothecary Return
-              </h4>
-              <p className="text-xs text-[#404943] leading-relaxed">
-                Return empty 330ml & 500ml cork bottles on your next order for GH₵ 5.00 botanic
-                credit.
-              </p>
-            </div>
           </div>
         </div>
       </section>

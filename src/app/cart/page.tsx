@@ -12,12 +12,12 @@ export default function CartCheckoutPage() {
   const router = useRouter()
   const { items, updateQuantity, removeItem, clearCart, subtotal } = useCart()
 
-  const [fullName, setFullName] = useState('Kofi Mensah')
-  const [phoneNumber, setPhoneNumber] = useState('24 555 8901')
-  const [deliveryLocation, setDeliveryLocation] = useState('Greater Accra')
-  const [deliveryAddress, setDeliveryAddress] = useState('House 14, Ringway Estates, Osu, Accra')
+  const [fullName, setFullName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [deliveryLocation, setDeliveryLocation] = useState('')
+  const [deliveryAddress, setDeliveryAddress] = useState('')
   const [additionalInstructions, setAdditionalInstructions] = useState(
-    'Please deliver well chilled before 3 PM'
+    ''
   )
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -286,20 +286,6 @@ export default function CartCheckoutPage() {
                   </div>
                 </div>
               )}
-
-              {/* Thermal Guarantee Callout */}
-              <div className="bg-[#f6f3ea] p-4 border-l-4 border-[#003422] flex items-start gap-4">
-                <ShieldCheck className="w-6 h-6 text-[#003422] shrink-0 mt-0.5" />
-                <div className="flex flex-col">
-                  <h3 className="text-xs uppercase tracking-wider text-[#003422] font-bold">
-                    Thermal Integrity Guaranteed
-                  </h3>
-                  <p className="text-xs text-[#404943] leading-relaxed">
-                    Every glass bottle is hand-stoppered and transported in chilled canvas coolers to
-                    ensure crisp herb aromatics stay undisturbed from our workshop to your door.
-                  </p>
-                </div>
-              </div>
             </div>
 
             {/* RIGHT COLUMN: WhatsApp Checkout Form (5 Cols) */}
@@ -333,7 +319,6 @@ export default function CartCheckoutPage() {
                       <span>
                         Full Name <span className="text-red-600">*</span>
                       </span>
-                      <span className="text-[10px] text-[#404943]">e.g., Kofi Mensah</span>
                     </label>
                     <input
                       id="fullName"
@@ -354,7 +339,6 @@ export default function CartCheckoutPage() {
                       <span>
                         WhatsApp Phone <span className="text-red-600">*</span>
                       </span>
-                      <span className="text-[10px] text-[#404943]">e.g. 24 555 8901</span>
                     </label>
                     <div className="flex">
                       <span className="bg-[#ebe8df] px-3 py-2.5 border border-r-0 border-[#003422]/20 text-xs font-semibold text-[#003422] flex items-center">
@@ -381,7 +365,6 @@ export default function CartCheckoutPage() {
                       <span>
                         Delivery Location <span className="text-red-600">*</span>
                       </span>
-                      <span className="text-[10px] text-[#404943]">e.g. East Legon, Osu, Tema</span>
                     </label>
                     <input
                       id="deliveryLocation"
@@ -402,7 +385,6 @@ export default function CartCheckoutPage() {
                       <span>
                         Street Address / Landmark <span className="text-red-600">*</span>
                       </span>
-                      <span className="text-[10px] text-[#404943]">House & street</span>
                     </label>
                     <textarea
                       id="deliveryAddress"
@@ -423,7 +405,6 @@ export default function CartCheckoutPage() {
                       <span>
                         Delivery Notes <span className="text-[#404943] font-normal">(Optional)</span>
                       </span>
-                      <span className="text-[10px] text-[#404943]">Gate code, chill time</span>
                     </label>
                     <input
                       id="additionalInstructions"

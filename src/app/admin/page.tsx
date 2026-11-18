@@ -8,21 +8,29 @@ import {
   ArrowRight,
   MessageCircle,
   Wine,
+  PackageOpen,
 } from 'lucide-react'
+
+// Ensure fresh dynamic server evaluation on every request
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function AdminOverviewPage() {
   const orders = await fetchOrders()
   const products = await fetchProducts()
 
-  // Four Core Summary Stats
+  // Live Summary Stats from real database records
   const totalOrders = orders.length
   const pendingOrders = orders.filter((o) => o.status === 'pending').length
   const completedOrders = orders.filter((o) => o.status === 'completed').length
+  
+  // Real revenue calculated strictly from completed orders
   const totalRevenue = orders
     .filter((o) => o.status === 'completed')
     .reduce((sum, o) => sum + o.totalAmount, 0)
 
   const recentOrders = orders.slice(0, 5)
+  const activeProducts = products.filter((p) => p.availability === 'available').length
 
   return (
     <div className="max-w-[1360px] mx-auto w-full space-y-8">
@@ -33,24 +41,24 @@ export default async function AdminOverviewPage() {
             BLESSED OPERATIONS CONSOLE
           </span>
           <h1 className="font-headline text-3xl sm:text-4xl text-[#003422] font-semibold tracking-tight">
-            Store Overview
+            Analytics & Overview
           </h1>
           <p className="text-sm text-[#404943] max-w-xl">
-            Live summary of daily drink batches, customer orders, and revenue.
+            Live real-time ledger of orders placed by customers, fulfillment statuses, and verified revenue.
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-start md:self-auto">
           <div className="bg-[#ffcd70] text-[#785500] px-4 py-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#7c5800]"></span>
+            <span className="w-2 h-2 rounded-full bg-[#7c5800] animate-ping"></span>
             <span className="text-xs uppercase tracking-wider font-semibold">
-              Store Status: Open for Orders
+              Live Storefront Connected
             </span>
           </div>
         </div>
       </div>
 
-      {/* 4 Small Summary Metric Cards (Google Stitch design) */}
+      {/* 4 Core Summary Metric Cards (Google Stitch design) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1: Total Orders */}
         <div className="bg-[#f6f3ea] p-6 flex flex-col justify-between h-44 border border-[#003422]/10 shadow-sm">
@@ -65,8 +73,9 @@ export default async function AdminOverviewPage() {
               {totalOrders}
             </span>
             <div className="mt-2 flex items-center gap-1.5 text-xs text-[#404943]">
-              <span className="text-[#174c36] font-bold">+12</span>
-              <span>received today</span>
+              <span>
+                {totalOrders === 0 ? 'No customer orders yet' : `${totalOrders} orders recorded`}
+              </span>
             </div>
           </div>
         </div>
@@ -85,7 +94,9 @@ export default async function AdminOverviewPage() {
             </span>
             <div className="mt-2 flex items-center gap-1.5 text-xs text-[#404943]">
               <span className="w-1.5 h-1.5 bg-[#7c5800] rounded-full"></span>
-              <span>Requires WhatsApp dispatch</span>
+              <span>
+                {pendingOrders === 0 ? 'All orders cleared' : 'Awaiting confirmation & dispatch'}
+              </span>
             </div>
           </div>
         </div>
@@ -103,7 +114,9 @@ export default async function AdminOverviewPage() {
               {completedOrders}
             </span>
             <div className="mt-2 flex items-center gap-1.5 text-xs text-[#404943]">
-              <span>Fulfilled this month</span>
+              <span>
+                {completedOrders === 0 ? 'No completed orders yet' : 'Successfully fulfilled'}
+              </span>
             </div>
           </div>
         </div>
@@ -121,13 +134,13 @@ export default async function AdminOverviewPage() {
               GH₵ {totalRevenue.toFixed(2)}
             </span>
             <div className="mt-2 flex items-center gap-1.5 text-xs text-[#404943]">
-              <span>Botanical batch sales</span>
+              <span>From completed orders</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Live Batch Vignette Banner */}
+      {/* Live Inventory Banner */}
       <div className="bg-[#f6f3ea] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#003422]/10">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-[#003422] text-[#ffcd70] flex items-center justify-center shrink-0">
@@ -135,11 +148,10 @@ export default async function AdminOverviewPage() {
           </div>
           <div>
             <h2 className="font-headline text-lg text-[#1c1c17] font-semibold">
-              Artisanal Batch #B-08 Active Today
+              Live Heritage Drink Formulations
             </h2>
             <p className="text-xs text-[#404943]">
-              Hibiscus-Prekese Infusion & Spiced Sobolo brewed at 05:30 GMT. 42 bottles left in cold
-              press.
+              {products.length} catalog beverages managed across artisanal categories (Fermented, Botanical, Sweet).
             </p>
           </div>
         </div>
@@ -147,17 +159,17 @@ export default async function AdminOverviewPage() {
         <div className="flex items-center gap-4 shrink-0">
           <div className="text-right hidden sm:block">
             <span className="text-[10px] uppercase tracking-widest text-[#404943] block">
-              Inventory Reserve
+              Inventory In Stock
             </span>
             <span className="text-sm font-bold text-[#003422]">
-              {products.filter((p) => p.availability === 'available').length} Blends Active
+              {activeProducts} Available Blends
             </span>
           </div>
           <Link
             href="/admin/drinks"
             className="bg-[#003422] text-white px-4 py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-[#174c36] transition-colors"
           >
-            Manage Inventory
+            Manage Drinks
           </Link>
         </div>
       </div>
@@ -179,95 +191,120 @@ export default async function AdminOverviewPage() {
           </Link>
         </div>
 
-        {/* Orders Table */}
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#ebe8df] text-[#404943] text-xs uppercase tracking-wider border-b border-[#003422]/10">
-                <th className="py-3.5 px-6 font-semibold">Order ID</th>
-                <th className="py-3.5 px-6 font-semibold">Customer</th>
-                <th className="py-3.5 px-6 font-semibold">Amount</th>
-                <th className="py-3.5 px-6 font-semibold">Timestamp</th>
-                <th className="py-3.5 px-6 font-semibold">Status</th>
-                <th className="py-3.5 px-6 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm text-[#1c1c17] divide-y divide-[#003422]/5">
-              {recentOrders.map((order) => {
-                let statusBadge = (
-                  <span className="inline-flex items-center px-2.5 py-0.5 bg-[#ffcd70] text-[#785500] text-xs uppercase tracking-wider font-bold">
-                    Pending
-                  </span>
-                )
+        {/* Orders Table or Empty State */}
+        {recentOrders.length === 0 ? (
+          <div className="p-12 text-center flex flex-col items-center justify-center">
+            <PackageOpen className="w-12 h-12 text-[#404943]/40 mb-3" />
+            <h3 className="font-headline text-lg text-[#003422] font-semibold">No Customer Orders Yet</h3>
+            <p className="text-xs text-[#404943] max-w-sm mt-1 mb-4">
+              When customers select drinks on the website and proceed to WhatsApp checkout, new orders will immediately appear here.
+            </p>
+            <Link
+              href="/"
+              target="_blank"
+              className="text-xs uppercase font-semibold tracking-wider text-[#7c5800] hover:text-[#003422] transition-colors"
+            >
+              Preview Live Storefront ↗
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-[#ebe8df] text-[#404943] text-xs uppercase tracking-wider border-b border-[#003422]/10">
+                  <th className="py-3.5 px-6 font-semibold">Order ID</th>
+                  <th className="py-3.5 px-6 font-semibold">Customer</th>
+                  <th className="py-3.5 px-6 font-semibold">Amount</th>
+                  <th className="py-3.5 px-6 font-semibold">Timestamp</th>
+                  <th className="py-3.5 px-6 font-semibold">Status</th>
+                  <th className="py-3.5 px-6 text-right font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm text-[#1c1c17] divide-y divide-[#003422]/5">
+                {recentOrders.map((order) => {
+                  let statusBadge = (
+                    <span className="inline-flex items-center px-2.5 py-0.5 bg-[#ffcd70] text-[#785500] text-xs uppercase tracking-wider font-bold">
+                      Pending
+                    </span>
+                  )
 
-                if (order.status === 'confirmed') {
-                  statusBadge = (
-                    <span className="inline-flex items-center px-2.5 py-0.5 bg-[#174c36] text-white text-xs uppercase tracking-wider font-bold">
-                      Confirmed
-                    </span>
-                  )
-                } else if (order.status === 'completed') {
-                  statusBadge = (
-                    <span className="inline-flex items-center px-2.5 py-0.5 bg-[#003422] text-white text-xs uppercase tracking-wider font-bold">
-                      Completed
-                    </span>
-                  )
-                } else if (order.status === 'processing') {
-                  statusBadge = (
-                    <span className="inline-flex items-center px-2.5 py-0.5 bg-[#434343] text-white text-xs uppercase tracking-wider font-bold">
-                      Processing
-                    </span>
-                  )
-                }
+                  if (order.status === 'confirmed') {
+                    statusBadge = (
+                      <span className="inline-flex items-center px-2.5 py-0.5 bg-[#174c36] text-white text-xs uppercase tracking-wider font-bold">
+                        Confirmed
+                      </span>
+                    )
+                  } else if (order.status === 'completed') {
+                    statusBadge = (
+                      <span className="inline-flex items-center px-2.5 py-0.5 bg-[#003422] text-white text-xs uppercase tracking-wider font-bold">
+                        Completed
+                      </span>
+                    )
+                  } else if (order.status === 'processing') {
+                    statusBadge = (
+                      <span className="inline-flex items-center px-2.5 py-0.5 bg-[#434343] text-white text-xs uppercase tracking-wider font-bold">
+                        Processing
+                      </span>
+                    )
+                  } else if (order.status === 'cancelled') {
+                    statusBadge = (
+                      <span className="inline-flex items-center px-2.5 py-0.5 bg-[#ba1a1a]/15 text-[#ba1a1a] text-xs uppercase tracking-wider font-bold">
+                        Cancelled
+                      </span>
+                    )
+                  }
 
-                return (
-                  <tr key={order.orderId} className="hover:bg-[#fcf9f0] transition-colors">
-                    <td className="py-4 px-6 font-bold text-[#003422] text-xs tracking-wider">
-                      {order.orderId}
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-[#1c1c17]">{order.customerName}</span>
-                        <span className="text-xs text-[#404943]">{order.deliveryLocation}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 font-semibold text-[#1c1c17]">
-                      GH₵ {order.totalAmount.toFixed(2)}
-                    </td>
-                    <td className="py-4 px-6 text-xs text-[#404943]">{order.createdAt}</td>
-                    <td className="py-4 px-6">{statusBadge}</td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={`https://wa.me/${order.phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                            `Hello ${order.customerName}, regarding order ${order.orderId}`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 flex items-center justify-center bg-[#f1eee5] text-[#003422] hover:bg-[#003422] hover:text-white transition-colors"
-                          title="WhatsApp Customer"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </a>
-                        <Link
-                          href="/admin/orders"
-                          className="px-3 py-1.5 bg-[#003422] text-white text-xs uppercase tracking-wider hover:bg-[#174c36] transition-colors"
-                        >
-                          View
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                  return (
+                    <tr key={order.orderId} className="hover:bg-[#fcf9f0] transition-colors">
+                      <td className="py-4 px-6 font-bold text-[#003422] text-xs tracking-wider">
+                        {order.orderId}
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[#1c1c17]">{order.customerName}</span>
+                          <span className="text-xs text-[#404943]">{order.deliveryLocation}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 font-semibold text-[#1c1c17]">
+                        GH₵ {order.totalAmount.toFixed(2)}
+                      </td>
+                      <td className="py-4 px-6 text-xs text-[#404943]">{order.createdAt}</td>
+                      <td className="py-4 px-6">{statusBadge}</td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={`https://wa.me/${order.phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              `Hello ${order.customerName}, regarding order ${order.orderId}`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 flex items-center justify-center bg-[#f1eee5] text-[#003422] hover:bg-[#003422] hover:text-white transition-colors"
+                            title="WhatsApp Customer"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                          </a>
+                          <Link
+                            href="/admin/orders"
+                            className="px-3 py-1.5 bg-[#003422] text-white text-xs uppercase tracking-wider hover:bg-[#174c36] transition-colors"
+                          >
+                            View
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div className="p-4 px-6 bg-[#f1eee5] flex flex-col sm:flex-row items-center justify-between text-xs text-[#404943]">
-          <span>Showing {recentOrders.length} of {totalOrders} recorded orders.</span>
+          <span>
+            Showing {recentOrders.length} of {totalOrders} recorded orders.
+          </span>
           <span className="uppercase tracking-widest text-[10px]">
-            Archived in Blessed Drinks Ledger
+            Live Neon Database Ledger
           </span>
         </div>
       </div>
