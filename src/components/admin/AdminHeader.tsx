@@ -1,7 +1,26 @@
+'use client'
+
 import Link from 'next/link'
-import { User, ShoppingBag } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ShoppingBag, LogOut } from 'lucide-react'
 
 export function AdminHeader({ title }: { title?: string }) {
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout' }),
+      })
+      router.push('/admin/login')
+      router.refresh()
+    } catch (e) {
+      router.push('/admin/login')
+    }
+  }
+
   return (
     <header className="fixed top-0 left-64 right-0 h-20 bg-[#fcf9f0]/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#003422]/10 z-40 flex items-center justify-between px-8">
       <div className="flex items-center gap-3">
@@ -12,22 +31,22 @@ export function AdminHeader({ title }: { title?: string }) {
 
       <div className="flex items-center gap-6">
         <Link
-          href="/cart"
-          className="relative p-2 text-[#1c1c17] hover:text-[#003422] transition-colors"
-          title="Preview Cart"
+          href="/"
+          target="_blank"
+          className="text-xs uppercase tracking-wider text-[#404943] hover:text-[#003422] transition-colors"
+          title="Preview Storefront"
         >
-          <ShoppingBag className="w-5 h-5" />
+          View Storefront ↗
         </Link>
 
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#003422] text-white flex items-center justify-center font-bold text-xs">
-            A
-          </div>
-          <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-semibold text-[#1c1c17]">Blessed Admin</span>
-            <span className="text-[10px] text-[#404943]">Accra Depot Lead</span>
-          </div>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-[#ba1a1a]/30 text-[#ba1a1a] hover:bg-[#ba1a1a]/10 text-xs font-semibold uppercase tracking-wider transition-colors"
+          title="Sign out of Admin Dashboard"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </header>
   )

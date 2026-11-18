@@ -40,27 +40,17 @@ export function Header() {
             Home
           </Link>
           <a
-            href="#drinks-catalog"
+            href="/#drinks-catalog"
             className="text-xs uppercase tracking-widest text-[#404943] hover:text-[#003422] transition-colors"
           >
             Drinks
           </a>
           <a
-            href="#about-section"
+            href="/#about-section"
             className="text-xs uppercase tracking-widest text-[#404943] hover:text-[#003422] transition-colors"
           >
             About
           </a>
-          <Link
-            href="/admin"
-            className={`text-xs uppercase tracking-widest transition-colors ${
-              pathname.startsWith('/admin')
-                ? 'text-[#003422] font-bold border-b-2 border-[#003422] pb-1'
-                : 'text-[#404943] hover:text-[#003422]'
-            }`}
-          >
-            Admin Portal
-          </Link>
         </nav>
 
         {/* Right Actions */}
@@ -76,14 +66,6 @@ export function Header() {
                 {itemCount}
               </span>
             )}
-          </Link>
-
-          <Link
-            href="/admin"
-            title="Administrator Sign In"
-            className="w-8 h-8 rounded-full bg-[#003422] text-white flex items-center justify-center hover:bg-[#174c36] transition-colors"
-          >
-            <User className="w-4 h-4" />
           </Link>
         </div>
       </div>

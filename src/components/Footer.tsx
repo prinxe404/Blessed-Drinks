@@ -88,12 +88,7 @@ export function Footer() {
             reserved.
           </span>
           <div className="flex items-center gap-6">
-            <Link
-              href="/admin"
-              className="text-[11px] text-[#404943] hover:text-[#003422] transition-colors"
-            >
-              Operations Portal
-            </Link>
+            <span className="text-[11px] text-[#404943]">Artisanal Heritage Beverages</span>
             <span className="text-[11px] text-[#404943]">Wholesale Logistics</span>
           </div>
         </div>
