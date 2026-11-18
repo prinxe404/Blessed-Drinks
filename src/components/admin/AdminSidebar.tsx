@@ -1,10 +1,10 @@
+// 'use client'
 'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BarChart3, Wine, Truck, Store, Settings as SettingsIcon } from 'lucide-react'
 
-export function AdminSidebar() {
+export function AdminSidebar({ className = '', onLinkClick }: { className?: string; onLinkClick?: () => void }) {
   const pathname = usePathname()
 
   const links = [
@@ -32,7 +32,9 @@ export function AdminSidebar() {
   ]
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-[#f6f3ea] border-r border-[#003422]/10 z-50 flex flex-col pt-6 pb-6">
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 bg-[#f6f3ea] border-r border-[#003422]/10 transform transition-transform duration-200 md:relative md:translate-x-0 md:w-64 ${className}`}
+    >
       {/* Brand Header */}
       <div className="px-6 mb-8">
         <div className="flex items-center gap-2 mb-1">
@@ -53,11 +55,11 @@ export function AdminSidebar() {
         {links.map((link) => {
           const isActive = link.exact ? pathname === link.href : pathname.startsWith(link.href)
           const Icon = link.icon
-
           return (
             <Link
               key={link.href}
               href={link.href}
+              onClick={() => onLinkClick && onLinkClick()}
               className={`flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-wider transition-all font-semibold ${
                 isActive
                   ? 'bg-[#174c36] text-[#86bc9f]'

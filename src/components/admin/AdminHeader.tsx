@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, LogOut } from 'lucide-react'
+import { ShoppingBag, LogOut, Menu } from 'lucide-react'
 
-export function AdminHeader({ title }: { title?: string }) {
+export function AdminHeader({ title, onMenuClick }: { title?: string; onMenuClick?: () => void }) {
   const router = useRouter()
 
   const handleLogout = async () => {
