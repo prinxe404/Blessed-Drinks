@@ -146,10 +146,7 @@ export default function CartCheckoutPage() {
                 <span className="text-xs uppercase tracking-wider text-[#1c1c17] font-semibold">
                   Itemized Harvest ({items.length} Blends)
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#404943]">
-                  Accra Chilled Depot
-                </span>
-              </div>
+                </div>
 
               {/* Items List */}
               {items.length === 0 ? (
@@ -260,9 +257,9 @@ export default function CartCheckoutPage() {
                   </div>
                   <div className="flex justify-between items-center text-[#1c1c17] text-sm">
                     <span className="flex items-center gap-2">
-                      Direct Chilled Courier{' '}
+                      Delivery fee{' '}
                       <span className="text-[#7c5800] text-[10px] uppercase font-semibold">
-                        (Accra & Tema Metro)
+                        (KNUST)
                       </span>
                     </span>
                     <span className="font-semibold text-[#003422]">
@@ -293,19 +290,12 @@ export default function CartCheckoutPage() {
               <div className="bg-white p-6 sm:p-8 border border-[#003422]/20 shadow-md">
                 <div className="border-b border-[#003422]/10 pb-4 mb-4">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs uppercase tracking-widest text-[#7c5800] font-bold flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4 text-[#7c5800]" /> Instant Concierge
-                    </span>
-                    <span className="bg-[#ffcd70] text-[#785500] px-2 py-0.5 text-[10px] tracking-wider uppercase font-bold">
-                      No Account Needed
-                    </span>
                   </div>
                   <h2 className="font-headline text-2xl text-[#003422] leading-tight font-semibold">
                     Express WhatsApp Checkout
                   </h2>
                   <p className="text-xs text-[#404943] mt-1 leading-relaxed">
-                    No credit cards or passwords. We prepare and allocate your batch in direct
-                    conversation with our Accra dispatch lead.
+                    Order will be sent to Whatsapp where you will confirm the payment via MoMo
                   </p>
                 </div>
 
@@ -459,10 +449,7 @@ export default function CartCheckoutPage() {
                   </p>
                   <div className="flex items-center gap-4 mt-2 text-[#404943] text-[11px]">
                     <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-[#003422] rounded-full"></span> Accra: 45–90 min
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-[#003422] rounded-full"></span> Tema: Daily 2 PM
+                      <span className="w-1.5 h-1.5 bg-[#003422] rounded-full"></span> KNUST: 45–90 min
                     </span>
                   </div>
                 </div>

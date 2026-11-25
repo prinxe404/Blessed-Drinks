@@ -43,7 +43,7 @@ export default async function OrderConfirmedPage({
                 Send the prepared order summary in the WhatsApp chat that just opened.
               </li>
               <li>
-                Our Accra dispatch team will verify fresh batch availability and calculate courier ETA.
+                Our dispatch team will verify fresh batch availability and calculate courier ETA.
               </li>
               <li>
                 Confirm and complete payment via Mobile Money (MTN MoMo or Telecel Cash) upon rider dispatch.
